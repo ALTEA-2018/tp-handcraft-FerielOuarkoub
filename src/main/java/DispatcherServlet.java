@@ -22,7 +22,6 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws  IOException {
 
-
         try {
         System.out.println("Getting request for " + req.getRequestURI());
         resp.setContentType("text/html") ;
@@ -30,16 +29,24 @@ public class DispatcherServlet extends HttpServlet {
         var uri = req.getRequestURI();
         var method = uriMappings.get(uri);
         var controller = method.getDeclaringClass().getDeclaredConstructor().newInstance();
-            var result =  method.invoke(controller,null);
+
+           var result =  method.invoke(controller);
+
+
             out.print(result.toString());
 
+
         } catch (IllegalAccessException | NoSuchMethodException | InstantiationException e) {
-            e.printStackTrace();
-            resp.sendError(505,"exception when calling method someThrowingMethod : some exception message");
+
+            resp.sendError(500,"exception when calling method someThrowingMethod : some exception message");
         } catch (InvocationTargetException e) {
-            resp.sendError(505,"exception when calling method someThrowingMethod : some exception message");
-            e.printStackTrace();
+            resp.sendError(500,"exception when calling method someThrowingMethod : some exception message");
+
+        } catch (NullPointerException e) {
+            resp.sendError(404,"no mapping found for request uri /test");
         }
+
+
 
     }
 
